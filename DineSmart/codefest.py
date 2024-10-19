@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # CORS import
 import requests
 import pandas as pd
 from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Set your Google Maps API key here
 API_KEY = 'AIzaSyC4DzQ-Pqsou_7GZfprZiw_-mJRpAi9akE'
@@ -15,7 +17,6 @@ def get_location_coordinates(location, api_key):
     data = response.json()
 
     if data['status'] == 'OK':
-        # Extracting latitude and longitude from the geocoding result
         lat_lng = data['results'][0]['geometry']['location']
         return lat_lng['lat'], lat_lng['lng']
     else:
@@ -24,24 +25,18 @@ def get_location_coordinates(location, api_key):
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Calculate the great-circle distance between two points using the Haversine formula."""
     R = 6371  # Earth radius in kilometers
-
-    # Convert latitude and longitude from degrees to radians
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
     return R * c  # Distance in kilometers
 
 def fetch_restaurants(location, radius, search_type, cuisine, api_key):
     """Fetches restaurants near a given location using Google Places API with cuisine filtering."""
-    # The 'keyword' parameter is used to filter by cuisine
     url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={location}&radius={radius}&type={search_type}&keyword={cuisine}&key={api_key}"
     response = requests.get(url)
-    response.raise_for_status()  # Raise an error for bad status codes
+    response.raise_for_status()
     data = response.json()
 
     if data['status'] == 'OK':
