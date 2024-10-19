@@ -22,73 +22,138 @@
             </div>
         </div>
     </nav>
-    <header class="text-center text-white masthead" style="background:url('assets/img/bg-masthead.jpg')no-repeat center center;background-size:cover;"><div class="overlay"></div>
+
+    <header class="text-center text-white masthead" style="background:url('assets/img/bg-masthead.jpg')no-repeat center center;background-size:cover;">
+        <div class="overlay"></div>
         <div class="container">
             <div class="row">
                 <div class="col-xl-9 mx-auto position-relative">
                     <h1 class="mb-5">&lt;Dine Smarter/&gt;</h1>
                 </div>
                 <div class="col-md-10 col-lg-8 col-xl-7 mx-auto position-relative">
-                    <form>
+                    <form id="locationForm">
                         <div class="row">
-                            <div class="col-12 col-md-9 mb-2 mb-md-0"><input class="form-control form-control-lg" type="email" placeholder="Enter your location..." /></div>
-                            <div class="col-12 col-md-3"><button class="btn btn-primary btn-lg" type="submit">Search</button></div>
+                            <div class="col-12 col-md-9 mb-2 mb-md-0">
+                                <input class="form-control form-control-lg" id="locationInput" type="text" placeholder="Enter your location..." />
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <button class="btn btn-primary btn-lg" type="button" onclick="getLocation()">Use My Location</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </header>
-    <section class="showcase">
-        <div class="container-fluid p-0">
-            <div class="row g-0">
-                <div class="col-lg-6 text-white order-lg-2 showcase-img" style="background-image:url(&quot;assets/img/bg-showcase-1.jpg&quot;);"><span></span></div>
-                <div class="col-lg-6 my-auto order-lg-1 showcase-text">
-                    <h2>Fully Responsive Design</h2>
-                    <p class="lead mb-0">When you use a theme created with Bootstrap, you know that the theme will look great on any device, whether it's a phone, tablet, or desktop the page will behave responsively!</p>
-                </div>
-            </div>
-            <div class="row g-0">
-                <div class="col-lg-6 text-white showcase-img" style="background-image:url(&quot;assets/img/bg-showcase-2.jpg&quot;);"><span></span></div>
-                <div class="col-lg-6 my-auto order-lg-1 showcase-text">
-                    <h2>Updated For Bootstrap 5</h2>
-                    <p class="lead mb-0">Newly improved, and full of great utility classes, Bootstrap 5 is leading the way in mobile responsive web development! All of the themes are now using Bootstrap 5!</p>
-                </div>
-            </div>
-            <div class="row g-0">
-                <div class="col-lg-6 text-white order-lg-2 showcase-img" style="background-image:url(&quot;assets/img/bg-showcase-3.jpg&quot;);"><span></span></div>
-                <div class="col-lg-6 my-auto order-lg-1 showcase-text">
-                    <h2>Easy to Use &amp;&nbsp;Customize</h2>
-                    <p class="lead mb-0">Landing Page is just HTML and CSS with a splash of SCSS for users who demand some deeper customization options. Out of the box, just add your content and images, and your new landing page will be ready to go!</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="text-center bg-light testimonials">
+
+    <section class="text-center bg-light mt-5">
         <div class="container">
-            <h2 class="mb-5">What people are saying...</h2>
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="mx-auto testimonial-item mb-5 mb-lg-0"><img class="rounded-circle img-fluid mb-3" src="assets/img/testimonials-1.jpg">
-                        <h5>Margaret E.</h5>
-                        <p class="fw-light mb-0">"This is fantastic! Thanks so much guys!"</p>
+            <h2 class="mb-5">Tell us about your dining preferences!</h2>
+            <form id="surveyForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="question1" class="form-label">1. Preferred Cuisine</label>
+                        <input type="text" class="form-control" id="question1" placeholder="e.g., Italian, Chinese, etc.">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="question2" class="form-label">2. Dining Budget</label>
+                        <input type="text" class="form-control" id="question2" placeholder="e.g., $$, $$$">
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="mx-auto testimonial-item mb-5 mb-lg-0"><img class="rounded-circle img-fluid mb-3" src="assets/img/testimonials-2.jpg">
-                        <h5>Fred S.</h5>
-                        <p class="fw-light mb-0">"Bootstrap is amazing. I've been using it to create lots of super nice landing pages."</p>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="question3" class="form-label">3. Favorite Meal Type</label>
+                        <input type="text" class="form-control" id="question3" placeholder="e.g., Breakfast, Lunch, Dinner">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="question4" class="form-label">4. Preferred Atmosphere</label>
+                        <input type="text" class="form-control" id="question4" placeholder="e.g., Casual, Fine Dining">
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="mx-auto testimonial-item mb-5 mb-lg-0"><img class="rounded-circle img-fluid mb-3" src="assets/img/testimonials-3.jpg">
-                        <h5>Sarah W.</h5>
-                        <p class="fw-light mb-0">"Thanks so much for making these free resources available to us!"</p>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="question5" class="form-label">5. Interested in Outdoor Seating?</label>
+                        <select class="form-select" id="question5">
+                            <option value="">Choose...</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="question6" class="form-label">6. Do you have dietary restrictions?</label>
+                        <input type="text" class="form-control" id="question6" placeholder="e.g., Vegan, Gluten-Free">
                     </div>
                 </div>
-            </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="question7" class="form-label">7. How important is local cuisine?</label>
+                        <select class="form-select" id="question7">
+                            <option value="">Choose...</option>
+                            <option value="Very Important">Very Important</option>
+                            <option value="Somewhat Important">Somewhat Important</option>
+                            <option value="Not Important">Not Important</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="question8" class="form-label">8. What type of dining experience do you prefer?</label>
+                        <input type="text" class="form-control" id="question8" placeholder="e.g., Family-style, Solo Dining">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="question9" class="form-label">9. Do you prefer restaurants with a view?</label>
+                        <select class="form-select" id="question9">
+                            <option value="">Choose...</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="question10" class="form-label">10. How far are you willing to travel for food?</label>
+                        <input type="text" class="form-control" id="question10" placeholder="e.g., 5 miles, 10 minutes">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
         </div>
     </section>
+
+    <section id="recommendations" class="text-center mt-5" style="display:none;">
+        <div class="container">
+            <h2 class="mb-5">Nearby Restaurant Recommendations</h2>
+            <div id="restaurantList"></div>
+        </div>
+    </section>
+
+    <script>
+        // Function to capture user geolocation
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            document.getElementById('locationInput').value = 
+                "Latitude: " + position.coords.latitude + 
+                ", Longitude: " + position.coords.longitude;
+            // Add API call to fetch restaurants based on geolocation
+            // e.g., fetch data from Google Maps, Yelp API, or similar
+        }
+
+        // Handling survey form submission
+        document.getElementById('surveyForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('recommendations').style.display = 'block';
+            // Use collected data to recommend restaurants (use APIs here)
+            // Example: Based on geolocation and preferences, display restaurant options
+            let restaurantList = document.getElementById('restaurantList');
+            restaurantList.innerHTML = `<p>Recommended Restaurant 1</p><p>Recommended Restaurant 2</p>`;
+        });
+    </script>
+
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 
