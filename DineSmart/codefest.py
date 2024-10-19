@@ -3,10 +3,10 @@ import requests
 import pandas as pd
 from math import radians, sin, cos, sqrt, atan2
 
+app = Flask(__name__)
+
 # Set your Google Maps API key here
 API_KEY = 'AIzaSyC4DzQ-Pqsou_7GZfprZiw_-mJRpAi9akE'
-
-app = Flask(__name__)
 
 def get_location_coordinates(location, api_key):
     """Converts a city, state to coordinates (lat, lon) using Google Geocoding API."""
@@ -36,9 +36,10 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
     return R * c  # Distance in kilometers
 
-def fetch_restaurants(location, radius, api_key):
-    """Fetches restaurants near a given location using Google Places API."""
-    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={location}&radius={radius}&type=restaurant&key={api_key}"
+def fetch_restaurants(location, radius, search_type, cuisine, api_key):
+    """Fetches restaurants near a given location using Google Places API with cuisine filtering."""
+    # The 'keyword' parameter is used to filter by cuisine
+    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={location}&radius={radius}&type={search_type}&keyword={cuisine}&key={api_key}"
     response = requests.get(url)
     response.raise_for_status()  # Raise an error for bad status codes
     data = response.json()
@@ -75,24 +76,27 @@ def map_rating_to_stars(rating):
     else:
         return '★'
 
+def map_price_level_to_dollar_signs(price_level):
+    """Map price level to dollar signs."""
+    price_map = {1: "$", 2: "$$", 3: "$$$", 4: "$$$$"}
+    return price_map.get(price_level, "Free/No Info")
+
 @app.route('/get_restaurants', methods=['POST'])
 def get_restaurants():
-    """Handles the incoming request for restaurant data."""
-    data = request.get_json()
-    city = data.get('city')
-    state = data.get('state')
-    
-    location = f"{city}, {state}"
-
     try:
+        data = request.json
+        location = f"{data['city']}, {data['state']}"
+        cuisine = data['cuisine']
+
         # Get latitude and longitude for the city, state
         user_lat, user_lon = get_location_coordinates(location, API_KEY)
 
         # Define search parameters
         radius = 5000  # 5 km radius
+        search_type = 'restaurant'
 
-        # Fetch restaurants near the location
-        restaurants = fetch_restaurants(f"{user_lat},{user_lon}", radius, API_KEY)
+        # Fetch restaurants near the location that match the chosen cuisine
+        restaurants = fetch_restaurants(f"{user_lat},{user_lon}", radius, search_type, cuisine, API_KEY)
 
         restaurant_list = []
         for restaurant in restaurants:
@@ -113,26 +117,23 @@ def get_restaurants():
             # Map rating to stars
             stars = map_rating_to_stars(rating)
 
-            # Get restaurant timings
-            opening_hours = details.get('opening_hours', {})
-            timings = opening_hours.get('weekday_text', ['N/A'])[0] if opening_hours else 'N/A'
-
-            # Check if a bar is included
-            bar_included = "Yes" if "bar" in details.get('types', []) else "No"
+            # Get price level
+            price_level = details.get('price_level', 'N/A')
+            price = map_price_level_to_dollar_signs(price_level)
 
             # Append details to the list
             restaurant_list.append({
-                'Name': name,
-                'Distance (miles)': f"{distance * 0.621371:.2f}",  # Convert km to miles
-                'Stars': stars,
-                'Timings': timings,
-                'Bar Included': bar_included
+                'name': name,
+                'distance': f"{distance * 0.621371:.2f}",  # Convert km to miles
+                'price': price,
+                'stars': stars,
+                'rating': rating
             })
 
         return jsonify(restaurant_list)
 
     except Exception as e:
-        return jsonify({'error': str(e)})
+        return jsonify({"error": str(e)})
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
