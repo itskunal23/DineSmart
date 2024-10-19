@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Finder with Questionnaire</title>
+    <link rel="stylesheet" href="bootstrap.min.css"> <!-- Ensure the path is correct -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic&display=swap">
+    <style>
+        /* Optional styles for better visuals */
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Find Restaurants</h1>
+        
+        <!-- Questionnaire Section -->
+        <form id="questionnaire-form" class="mb-3">
+            <h3>Questionnaire</h3>
+            <label for="food-type">What type of food do you prefer?</label>
+            <input type="text" id="food-type" placeholder="Enter food type" required>
+
+            <label for="price-range">What is your price range? (e.g., $$, $$$)</label>
+            <input type="text" id="price-range" placeholder="Enter price range" required>
+
+            <label for="occasion">Is there a special occasion? (e.g., birthday, anniversary)</label>
+            <input type="text" id="occasion" placeholder="Enter occasion" required>
+        </form>
+
+        <!-- Restaurant Search Section -->
+        <form id="restaurant-form" class="mb-3">
+            <input type="text" id="city" placeholder="Enter city" required>
+            <input type="text" id="state" placeholder="Enter state" required>
+            <button type="submit">Find Restaurants</button>
+        </form>
+        
+        <div id="results"></div> <!-- This is where the results will be displayed -->
+    </div>
+
+    <script src="static/script.js"></script> <!-- Ensure the path to your JS file is correct -->
+</body>
+</html>
