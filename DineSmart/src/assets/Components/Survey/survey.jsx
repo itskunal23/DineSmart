@@ -6,13 +6,9 @@ const Survey = () => {
     const [formData, setFormData] = useState({
         preferredCuisine: '',
         diningBudget: '',
-        favoriteMealType: '',
-        preferredAtmosphere: '',
-        outdoorSeating: '',
         dietaryRestrictions: '',
         localCuisineImportance: '',
         diningExperience: '',
-        restaurantWithView: '',
         travelDistance: ''
     });
 

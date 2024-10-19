@@ -9,7 +9,7 @@ document.getElementById('restaurant-form').addEventListener('submit', async func
     try {
         // Send POST request to the Flask API
         const response = await fetch('/get_restaurants', {
-            method: 'POST',
+            method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ city, state, cuisine })
         });

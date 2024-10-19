@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # CORS import
+# from flask_cors import CORS  # CORS import
 import requests
 import pandas as pd
 from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# CORS(app)  # Enable CORS for all routes
 
 # Set your Google Maps API key here
 API_KEY = 'AIzaSyC4DzQ-Pqsou_7GZfprZiw_-mJRpAi9akE'
@@ -76,7 +76,7 @@ def map_price_level_to_dollar_signs(price_level):
     price_map = {1: "$", 2: "$$", 3: "$$$", 4: "$$$$"}
     return price_map.get(price_level, "Free/No Info")
 
-@app.route('/get_restaurants', methods=['POST'])
+@app.route('/get_restaurants', methods=['GET'])
 def get_restaurants():
     try:
         data = request.json

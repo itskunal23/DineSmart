@@ -1,9 +1,7 @@
-import Home from './assets/Components/HomePage/home.jsx'
-
+import Survey from './src/assets/Components/Survey/survey.jsx';
 const App = () => {
   return (
     <div className='container'>
-      <Home/>
       <Survey/>
     </div>
   )
