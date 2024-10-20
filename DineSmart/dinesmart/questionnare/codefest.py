@@ -1,17 +1,20 @@
 from flask import Flask, request, jsonify
-# from flask_cors import CORS  # CORS import
+import os
 import requests
-import pandas as pd
 from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
-# CORS(app)  # Enable CORS for all routes
 
-# Set your Google Maps API key here
-API_KEY = 'AIzaSyC4DzQ-Pqsou_7GZfprZiw_-mJRpAi9akE'
+
+
+def get_api_key():
+    """Fetch the Google API key from environment variables."""
+    api_key = os.getenv('GOOGLE_API_KEY', 'AIzaSyC4DzQ-Pqsou_7GZfprZiw_-mJRpAi9akE') 
+    return api_key
+
 
 def get_location_coordinates(location, api_key):
-    """Converts a city, state to coordinates (lat, lon) using Google Geocoding API."""
+    """Convert a city, state to coordinates (lat, lon) using Google Geocoding API."""
     geocode_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={location}&key={api_key}"
     response = requests.get(geocode_url)
     data = response.json()
@@ -32,9 +35,9 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c  # Distance in kilometers
 
-def fetch_restaurants(location, radius, search_type, cuisine, api_key):
-    """Fetches restaurants near a given location using Google Places API with cuisine filtering."""
-    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={location}&radius={radius}&type={search_type}&keyword={cuisine}&key={api_key}"
+def fetch_restaurants(location, radius, search_type, api_key):
+    """Fetch restaurants near a given location using Google Places API."""
+    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={location}&radius={radius}&type={search_type}&key={api_key}"
     response = requests.get(url)
     response.raise_for_status()
     data = response.json()
@@ -43,92 +46,62 @@ def fetch_restaurants(location, radius, search_type, cuisine, api_key):
         return data['results']
     else:
         raise ValueError(f"Failed to fetch data from the API. Error: {data.get('status')}")
-
-def fetch_restaurant_details(place_id, api_key):
-    """Fetches detailed information about a restaurant using its Place ID."""
-    details_url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key={api_key}"
-    response = requests.get(details_url)
-    response.raise_for_status()
-    data = response.json()
-
-    if data['status'] == 'OK':
-        return data['result']
-    else:
-        raise ValueError(f"Failed to fetch restaurant details. Error: {data.get('status')}")
-
 def map_rating_to_stars(rating):
-    """Map Google Places rating (0-5) to a star rating (out of 5)."""
-    if rating == 'N/A':
-        return 'No Stars'
-    elif float(rating) >= 4.5:
-        return '★★★★★'
-    elif float(rating) >= 4.0:
-        return '★★★★'
-    elif float(rating) >= 3.5:
-        return '★★★'
-    elif float(rating) >= 3.0:
-        return '★★'
+    if rating is None:
+        return "N/A"  # Handle cases where rating is None
+    if rating >= 4.5:
+        return "★★★★★"  # 5 stars
+    elif rating >= 4.0:
+        return "★★★★☆"  # 4.5 stars
+    elif rating >= 3.5:
+        return "★★★★"  # 4 stars
+    elif rating >= 3.0:
+        return "★★★☆☆"  # 3.5 stars
+    elif rating >= 2.5:
+        return "★★★"  # 3 stars
+    elif rating >= 2.0:
+        return "★★☆☆☆"  # 2.5 stars
+    elif rating >= 1.5:
+        return "★★"  # 2 stars
+    elif rating >= 1.0:
+        return "★☆☆☆☆"  # 1.5 stars
     else:
-        return '★'
-
-def map_price_level_to_dollar_signs(price_level):
-    """Map price level to dollar signs."""
-    price_map = {1: "$", 2: "$$", 3: "$$$", 4: "$$$$"}
-    return price_map.get(price_level, "Free/No Info")
-
+        return "★"  # 1 star
 @app.route('/get_restaurants', methods=['GET'])
 def get_restaurants():
+    city = request.args.get('city')
+    state = request.args.get('state')
+    cuisine = request.args.get('cuisine')
+
+    # Ensure the required parameters are provided
+    if not city or not state or not cuisine:
+        return jsonify({"error": "Missing required parameters"}), 400
+
     try:
-        data = request.json
-        location = f"{data['city']}, {data['state']}"
-        cuisine = data['cuisine']
-
-        # Get latitude and longitude for the city, state
-        user_lat, user_lon = get_location_coordinates(location, API_KEY)
-
-        # Define search parameters
+        # Use your existing logic to fetch restaurant data
+        location = f"{city}, {state}"
+        api_key = 'YOUR_GOOGLE_API_KEY'  # Add your Google API key here or use an environment variable
+        user_lat, user_lon = get_location_coordinates(location, api_key)
+        
+        # Fetch restaurants
         radius = 5000  # 5 km radius
         search_type = 'restaurant'
+        restaurants = fetch_restaurants(f"{user_lat},{user_lon}", radius, search_type, api_key)
 
-        # Fetch restaurants near the location that match the chosen cuisine
-        restaurants = fetch_restaurants(f"{user_lat},{user_lon}", radius, search_type, cuisine, API_KEY)
-
-        restaurant_list = []
+        # Format the response for the frontend
+        restaurant_data = []
         for restaurant in restaurants:
-            name = restaurant.get('name', 'N/A')
-            rating = restaurant.get('rating', 'N/A')
-            place_id = restaurant.get('place_id')
-
-            # Fetch detailed restaurant info
-            details = fetch_restaurant_details(place_id, API_KEY)
-
-            # Restaurant's location (for distance calculation)
-            restaurant_lat = restaurant['geometry']['location']['lat']
-            restaurant_lon = restaurant['geometry']['location']['lng']
-
-            # Calculate distance from user location to the restaurant
-            distance = haversine_distance(user_lat, user_lon, restaurant_lat, restaurant_lon)
-
-            # Map rating to stars
-            stars = map_rating_to_stars(rating)
-
-            # Get price level
-            price_level = details.get('price_level', 'N/A')
-            price = map_price_level_to_dollar_signs(price_level)
-
-            # Append details to the list
-            restaurant_list.append({
-                'name': name,
-                'distance': f"{distance * 0.621371:.2f}",  # Convert km to miles
-                'price': price,
-                'stars': stars,
-                'rating': rating
+            restaurant_data.append({
+                'name': restaurant.get('name', 'N/A'),
+                'distance': haversine_distance(user_lat, user_lon, restaurant['geometry']['location']['lat'], restaurant['geometry']['location']['lng']),
+                'price': restaurant.get('price_level', 'N/A'),
+                'stars': map_rating_to_stars(restaurant.get('rating', 'N/A')),
+                'rating': restaurant.get('rating', 'N/A')
             })
 
-        return jsonify(restaurant_list)
-
+        return jsonify(restaurant_data)
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
